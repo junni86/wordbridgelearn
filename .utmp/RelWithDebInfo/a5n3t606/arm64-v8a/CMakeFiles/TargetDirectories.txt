@@ -1,0 +1,5 @@
+C:/Users/junni/Language_Game/.utmp/RelWithDebInfo/a5n3t606/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/junni/Language_Game/.utmp/RelWithDebInfo/a5n3t606/arm64-v8a/CMakeFiles/rebuild_cache.dir
+C:/Users/junni/Language_Game/.utmp/RelWithDebInfo/a5n3t606/arm64-v8a/FramePacing/CMakeFiles/swappywrapper.dir
+C:/Users/junni/Language_Game/.utmp/RelWithDebInfo/a5n3t606/arm64-v8a/FramePacing/CMakeFiles/edit_cache.dir
+C:/Users/junni/Language_Game/.utmp/RelWithDebInfo/a5n3t606/arm64-v8a/FramePacing/CMakeFiles/rebuild_cache.dir

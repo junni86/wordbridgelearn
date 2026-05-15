@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" package="com.google.unity.ads">
+  <uses-sdk android:minSdkVersion="23" />
+  <uses-permission android:name="android.permission.INTERNET" />
+  <application android:usesCleartextTraffic="true">
+    <uses-library android:required="false" android:name="org.apache.http.legacy" />
+    <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-8504316980589965~2135278160" tools:replace="android:value" />
+    <meta-data android:name="com.google.unity.ads.UNITY_VERSION" android:value="6000.4.4f1" tools:replace="android:value" />
+  </application>
+</manifest>

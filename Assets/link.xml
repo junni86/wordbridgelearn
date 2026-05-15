@@ -1,0 +1,6 @@
+<linker>
+    <assembly fullname="GoogleMobileAds" preserve="all"/>
+    <assembly fullname="GoogleMobileAds.Android" preserve="all"/>
+    <assembly fullname="GoogleMobileAds.Common" preserve="all"/>
+    <assembly fullname="GoogleMobileAds.Core" preserve="all"/>
+</linker>

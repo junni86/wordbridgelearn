@@ -1,0 +1,500 @@
+버리다,abandon
+따르다,abide
+폐지하다,abolish
+갑작스러운,abrupt
+절대적인,absolute
+흡수하다,absorb
+추상적인,abstract
+남용하다,abuse
+가속하다,accelerate
+접근,access
+수용하다,accommodate
+동반하다,accompany
+성취하다,accomplish
+일치하다,accord
+설명하다,account
+축적하다,accumulate
+정확한,accurate
+비난하다,accuse
+인식하다,acknowledge
+습득하다,acquire
+적응하다,adapt
+충분한,adequate
+조정하다,adjust
+관리하다,administer
+인정하다,admit
+채택하다,adopt
+진보하다,advance
+지지하다,advocate
+영향을 미치다,affect
+이합,aggregate
+할당하다,allocate
+변경하다,alter
+대안,alternative
+모호한,ambiguous
+분석하다,analyze
+예상하다,anticipate
+명백한,apparent
+호소하다,appeal
+적용하다,apply
+접근하다,approach
+적절한,appropriate
+대략적인,approximate
+임의의,arbitrary
+측면,aspect
+부여하다,assign
+지원하다,assist
+가정하다,assume
+확신시키다,assure
+달성하다,attain
+속성,attribute
+허가하다,authorize
+이익,benefit
+능력,capacity
+범주,category
+상황,circumstance
+붕괴하다,collapse
+보상하다,compensate
+복잡한,complex
+구성요소,component
+포괄적인,comprehensive
+집중하다,concentrate
+결론 짓다,conclude
+수행하다,conduct
+확인하다,confirm
+갈등,conflict
+고려하다,consider
+일관된,consistent
+지속적인,constant
+건설하다,construct
+소비하다,consume
+기여하다,contribute
+전환하다,convert
+핵심,core
+기준,criteria
+중요한,crucial
+감소하다,decline
+정의하다,define
+입증하다,demonstrate
+도출하다,derive
+~에도 불구하고,despite
+차원,dimension
+분배하다,distribute
+국내의,domestic
+제거하다,eliminate
+출현하다,emerge
+강조,emphasis
+가능하게 하다,enable
+맞닥뜨리다,encounter
+향상시키다,enhance
+보장하다,ensure
+수립하다,establish
+평가하다,evaluate
+분명한,evident
+확장하다,expand
+활용하다,exploit
+요인,factor
+특징,feature
+기본적인,fundamental
+생성하다,generate
+식별하다,identify
+영향,impact
+실행하다,implement
+나타내다,indicate
+해석하다,interpret
+포함하다,involve
+유지하다,maintain
+다수의,majority
+방법,method
+수정하다,modify
+획득하다,obtain
+발생하다,occur
+참여하다,participate
+인식하다,perceive
+정책,policy
+원리,principle
+과정,process
+요구하다,require
+응답하다,respond
+유의미한,significant
+구체적인,specific
+구조,structure
+이론,theory
+다양하다,vary
+현상학,phenomenology
+인식론,epistemology
+존재론,ontology
+형이상학,metaphysics
+변증법,dialectic
+해석학,hermeneutics
+비판이론,critique
+탈구조주의,poststructuralism
+해체주의,deconstruction
+구조주의,structuralism
+관념론,idealism
+유물론,materialism
+공리주의,utilitarianism
+의무론,deontology
+덕 윤리학,ethics
+계약론,contractualism
+자유주의,liberalism
+공동체주의,communitarianism
+공화주의,republicanism
+다원주의,pluralism
+헤게모니,hegemony
+이데올로기,ideology
+담론,discourse
+주체성,subjectivity
+객체성,objectivity
+상호주관성,intersubjectivity
+사회구성주의,constructivism
+기능주의,functionalism
+구조적 폭력,violence
+문화적 헤게모니,hegemony
+상징자본,capital
+아비투스,habitus
+장,field
+상징폭력,domination
+재생산,reproduction
+소외,alienation
+물화,reification
+상품화,commodification
+관료제,bureaucracy
+합리화,rationalization
+세속화,secularization
+근대화,modernization
+탈근대,postmodernity
+반성성,reflexivity
+행위자성,agency
+구조,constraint
+권력,power
+지배,domination
+저항,resistance
+해방,emancipation
+자율성,autonomy
+주권,sovereignty
+시민권,citizenship
+공론장,sphere
+숙의민주주의,deliberation
+대의민주주의,representation
+직접민주주의,participation
+포퓰리즘,populism
+권위주의,authoritarianism
+전체주의,totalitarianism
+국가이성,nationalism
+외교적 면책,immunity
+국제법,jurisprudence
+조약법,treaty
+관습법,customary
+강행규범,jus
+연성법,soft
+경성법,hard
+사법적 해석,interpretation
+법률행위,legal
+위헌,unconstitutional
+합헌,constitutional
+기본권,fundamental
+비례원칙,proportionality
+신뢰보호,legitimate
+법적 안정성,certainty
+죄형법정주의,legality
+무죄추정,presumption
+적법절차,process
+피의자,accused
+공소시효,prescription
+손해배상,damages
+불법행위,tort
+계약위반,breach
+형평성,equity
+법원,precedent
+상충,conflict
+합산,aggregation
+규범적,normative
+기술적,descriptive
+연역적,deductive
+귀납적,inductive
+가추적,abductive
+비판적 담론,discourse
+언어행위론,pragmatics
+화용론,pragmatics
+의미 잉여,surplus
+다의성,polysemy
+모호성,ambiguity
+함의,entailment
+전제,presupposition
+담화 분석,analysis
+발화수반,illocutionary
+텍스트성,textuality
+상호텍스트성,intertextuality
+기표,signifier
+기의,signified
+이항대립,opposition
+신화,mythology
+은유,metaphor
+환유,metonymy
+제유,synecdoche
+아이러니,irony
+역설,paradox
+알레고리,allegory
+상징,symbolism
+서술자,narrator
+초점화,focalization
+믿을 수 없는 서술자,unreliable
+자유간접화법,discourse
+내적 독백,monologue
+의식의 흐름,consciousness
+낯설게하기,defamiliarization
+자동화,automatization
+주제의식,theme
+장르 혼합,hybrid
+상호텍스트,intertext
+패러디,parody
+풍자,satire
+패스티시,pastiche
+비선형 서사,nonlinear
+다중 시점,perspective
+고전주의,classicism
+낭만주의,romanticism
+사실주의,realism
+자연주의,naturalism
+상징주의,symbolism
+모더니즘,modernism
+포스트모더니즘,postmodernism
+마술적 사실주의,magical
+포스트식민주의,postcolonialism
+페미니즘 비평,feminism
+생태비평,ecocriticism
+비판 이론,theory
+서사 이론,narratology
+인지 언어학,linguistics
+신경 미학,neuroaesthetics
+타자성,alterity
+사이성,hybridity
+경계성,liminality
+디아스포라,diaspora
+탈식민성,decoloniality
+교차성,intersectionality
+젠더 수행성,performativity
+생명권력,biopower
+규율권력,discipline
+감시사회,surveillance
+예외상태,exception
+벌거벗은 생명,bare
+주권과 생명,sovereignty
+양자택일,dilemma
+가치판단,value
+사실판단,factual
+규범 충돌,conflict
+법과 도덕,morality
+정의론,justice
+롤스의 무지의 베일,veil
+원초적 입장,position
+차등원칙,difference
+공정으로서의 정의,fairness
+자유지상주의,libertarianism
+공리 극대화,maximization
+역량 접근,capability
+인간안보,security
+발전의 자유,freedom
+아마르티아 센,Sen
+수능,CSAT
+논술,essay
+비문학,nonfiction
+문학,literature
+수사법,rhetoric
+추론,reasoning
+비판적 독해,reading
+논지,argument
+근거,evidence
+반론,counterargument
+양보,concession
+결론,conclusion
+전제,premise
+논리적 오류,fallacy
+허수아비 논증,strawman
+인신공격,ad
+순환논증,circular
+성급한 일반화,generalization
+미끄러운 경사,slippery
+잘못된 유추,analogy
+권위에의 호소,authority
+다수에의 호소,popularity
+인과혼동,correlation
+흑백논리,dichotomy
+복합질문,loaded
+감정에의 호소,emotion
+연역논증,deduction
+귀납논증,induction
+반증가능성,falsifiability
+검증가능성,verifiability
+패러다임 전환,revolution
+과학혁명,revolution
+정상과학,normal
+이상현상,anomaly
+연구프로그램,program
+방법론적 무정부주의,anarchism
+과학철학,philosophy
+기술결정론,determinism
+사회구성론,construction
+기술과 사회,society
+위험사회,risk
+성찰적 근대화,modernization
+세계위험사회,global
+지식사회,knowledge
+정보사회,information
+네트워크사회,network
+유동하는 근대,modernity
+고독한 군중,crowd
+비판적 이성,reason
+도구적 이성,instrumental
+의사소통 합리성,communicative
+생활세계,lifeworld
+체계,system
+식민화,colonization
+공론장 재봉건화,refeudalization
+미디어 생태계,ecology
+알고리즘 편향,bias
+필터 버블,bubble
+반향실 효과,chamber
+탈진실,post
+인포데믹,infodemic
+디지털 리터러시,literacy
+빅 테크,tech
+감시 자본주의,capitalism
+데이터 주권,sovereignty
+인공지능 윤리,ethics
+자동화 편향,bias
+기술 가속주의,accelerationism
+기후 정의,justice
+생태적 전환,transition
+탄소 민주주의,democracy
+녹색 뉴딜,deal
+기후 부채,debt
+환경적 인종주의,racism
+생태 근대주의,modernism
+행성 한계,boundary
+도넛 경제학,economics
+순환 경제,circular
+탈성장,degrowth
+계몽주의,enlightenment
+합리론,rationalism
+경험론,empiricism
+칸트 철학,Kantianism
+헤겔 변증법,dialectic
+마르크스주의,Marxism
+프랑크푸르트학파,Frankfurt
+현상학적 환원,reduction
+에포케,epoche
+지향성,intentionality
+타자,other
+얼굴,face
+레비나스,Levinas
+하이데거,Heidegger
+메를로퐁티,phenomenology
+시간성,temporality
+사실성,facticity
+피투성,thrownness
+기투,projection
+죽음을 향한 존재,being
+불안,anxiety
+양심,conscience
+결단성,resoluteness
+고독,solitude
+실존적 자유,freedom
+부조리,absurd
+반항,revolt
+시지프스,Sisyphus
+타자의 시선,gaze
+대자존재,itself
+즉자존재,itself
+자기기만,deception
+상호인정,recognition
+승인욕구,recognition
+인정 투쟁,struggle
+아노미,anomie
+탈주술화,disenchantment
+가치다원주의,pluralism
+사실과 가치,value
+베버 합리화,rationalization
+관료제적 지배,domination
+카리스마,charisma
+전통적 지배,domination
+합법적 지배,domination
+이상형,ideal
+사회학적 상상력,imagination
+구조적 기능주의,functionalism
+사회통합,integration
+잠재적 기능,function
+역기능,dysfunction
+사회적 사실,fact
+집합의식,conscience
+기계적 연대,solidarity
+유기적 연대,solidarity
+사회화,socialization
+사회계층,stratification
+사회적 유동성,mobility
+계급의식,consciousness
+이데올로기 비판,critique
+허위의식,consciousness
+토대와 상부구조,superstructure
+문화산업,industry
+대중문화,culture
+스펙터클,spectacle
+일상생활 비판,critique
+시뮬라크르,simulacrum
+하이퍼리얼리티,hyperreality
+기호 소비,consumption
+포스트포디즘,postfordism
+유연축적,accumulation
+금융화,financialization
+불평등,inequality
+피케티,Piketty
+세습자본주의,capitalism
+지대추구,rent
+독점지대,rent
+플랫폼 독점,monopoly
+네트워크 효과,effect
+승자독식,winner
+제로섬,zero
+양의 외부효과,externality
+음의 외부효과,externality
+공공선택론,choice
+규제포획,capture
+정보의 비대칭,asymmetry
+도덕적 해이,hazard
+역선택,selection
+신호보내기,signaling
+리바이어던,Leviathan
+사회계약론,contract
+일반의지,will
+시민불복종,disobedience
+저항권,resistance
+혁명권,revolution
+연방주의,federalism
+분권화,decentralization
+보충성 원칙,subsidiarity
+글로벌 거버넌스,governance
+국제레짐,regime
+패권안정론,stability
+세력균형,balance
+상호확증파괴,destruction
+핵억지,deterrence
+집단안보,security
+인도적 개입,intervention
+보호책임,responsibility
+국제형사재판소,court
+세계시민주의,cosmopolitanism
+문명의 충돌,clash
+민주평화론,peace
+국제규범,norm
+인권레짐,regime
+개발협력,cooperation
+원조효과성,effectiveness
+남남협력,cooperation
+지속가능발전목표,goals
+초국적 기업,corporation
+조세피난처,haven
+자본도피,flight
+부채함정,trap
+구조적 조정,adjustment
+신흥국,emerging
