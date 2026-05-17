@@ -17,11 +17,29 @@ public class WormController : MonoBehaviour
     [Tooltip("터치 중일 때 (사용자가 적극적으로 조종할 때)")]
     public float touchSpeed = 4.0f;
 
-    [Header("몸통 이동 속도 (머리와 독립)")]
-    [Tooltip("터치 안 할 때 몸통이 머리를 따라가는 속도")]
-    public float bodySpeed = 1.5f;
-    [Tooltip("터치 중일 때 몸통이 머리를 따라가는 속도")]
-    public float bodyTouchSpeed = 7.0f;
+    [Header("정답 글자 누적 부스트")]
+    [Tooltip("정답 글자 1개당 머리 속도 증가율 (0.15 = +15%/글자, 단어마다 리셋)")]
+    public float speedBoostPerLetter = 0.0f;
+    // 현재 단어에서 먹은 정답 글자 수 — SetupWord에서 0으로 리셋, BoostSpeed에서 +1
+    int lettersEaten;
+
+    // 머리가 실제로 지나간 경로 — 매 프레임 기록, 몸통은 이 경로 위에서 거리만큼 뒤를 따라감
+    readonly List<Vector3> headPath = new();
+
+    [Header("디버그")]
+    [Tooltip("켜면 매 프레임 머리/몸통 이동량을 콘솔에 로그")]
+    public bool debugLogSpeeds = true;
+
+    // 직전 프레임 위치 기록 — 이번 프레임 이동량(=속도×dt) 계산용
+    Vector3 debugPrevHeadPos;
+    readonly List<Vector3> debugPrevBodyPositions = new();
+    bool debugHasPrev = false;
+
+    // 부스트 단계별 평균 이동량 누적 — 부스트 전/후 비교용
+    int debugPrevLettersEaten = -1;     // 직전 프레임 lettersEaten — 변화 감지용
+    float debugHeadDeltaSum = 0f;       // 현재 부스트 단계 누적 머리 이동량
+    float debugBody0DeltaSum = 0f;      // 현재 부스트 단계 누적 body0 이동량
+    int debugSampleCount = 0;           // 현재 부스트 단계 샘플 프레임 수
 
     // 현재 프레임에 터치 입력이 활성인지 (매 Update에서 HandleTouchInput이 갱신)
     bool isTouchActive;
@@ -47,8 +65,32 @@ public class WormController : MonoBehaviour
     // 몸통 세그먼트 리스트 (index 0 = 머리 바로 뒤, 마지막 = 꼬리)
     readonly List<WormSegment> bodySegments = new();
 
+    // 디버그용 — 씬 Hierarchy 전체 경로 (어느 부모 밑 자식인지 식별)
+    string GetFullPath()
+    {
+        string path = name;
+        Transform t = transform.parent;
+        while (t != null)
+        {
+            path = t.name + "/" + path;
+            t = t.parent;
+        }
+        return path;
+    }
+
     void Awake()
     {
+        // 디버그 강제 활성화 — Inspector/프리팹의 직렬화 값과 무관하게 켬
+        // (튜닝 끝나면 이 줄 제거하고 Inspector 토글 그대로 사용)
+        // debugLogSpeeds = true;
+
+        // 디버그 — WormController가 실제로 로드되었는지 확인 + 직렬화 필드 값 출력
+        // 인스턴스마다 값이 다른지 비교해 어느 프리팹/오브젝트가 운용 중인지 식별
+        // Debug.Log($"[WormSpeed] WormController.Awake (entityID={GetEntityId()}, name={name}) " +
+        //           $"speed={speed} touchSpeed={touchSpeed} speedBoostPerLetter={speedBoostPerLetter} " +
+        //           $"segmentSpacing={segmentSpacing} debugLogSpeeds={debugLogSpeeds} " +
+        //           $"path={GetFullPath()}");
+
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
         rb.linearDamping = 0f;
@@ -84,8 +126,18 @@ public class WormController : MonoBehaviour
     {
         targetWord = word ?? string.Empty;
 
+        // 새 단어 시작 — 부스트 카운터 리셋 (단어마다 원래 속도로 복귀)
+        lettersEaten = 0;
+
         // 새 단어 시작 시 머리를 화면 중앙(월드 원점)으로 리셋
         transform.position = Vector3.zero;
+
+        // 머리 경로 기록도 초기화 — 이전 단어 경로 따라가지 않도록
+        headPath.Clear();
+
+        // 디버그 속도 비교용 직전 위치 캐시 초기화 (새 단어 시작 시 위치 점프로 인한 거짓 양성 방지)
+        debugHasPrev = false;
+        debugPrevBodyPositions.Clear();
 
         // 기존 몸통 제거
         foreach (var seg in bodySegments)
@@ -108,6 +160,12 @@ public class WormController : MonoBehaviour
                 bodySegments.Add(seg);
             }
         }
+    }
+
+    // 정답 글자 1개 먹을 때 호출 — 부스트 카운터 +1 (단어마다 누적, SetupWord에서 리셋)
+    public void BoostSpeed()
+    {
+        lettersEaten++;
     }
 
     // 호스트가 정답 판정 후 호출 — 지정 인덱스 몸통에 글자 표시 + 선택적으로 스프라이트 교체
@@ -153,16 +211,20 @@ public class WormController : MonoBehaviour
 
     void Update()
     {
-        // 일시정지 중에는 입력/이동 모두 무시
-        if (isPaused) return;
+        // 일시정지(자체 isPaused 또는 글로벌 timeScale=0)면 입력/이동 무시 — PausePanel 위 클릭 차단
+        if (isPaused || Time.timeScale == 0f) return;
 
         HandleTouchInput();
         HandleWallBounce();
 
-        // 머리 속도: 터치 중 vs 비터치
-        float headSpeed = isTouchActive ? touchSpeed : speed;
+        // 정답 글자 누적 부스트 배율 — 0글자=1.0, 1글자=1.15, 2글자=1.30 ...
+        float boostMul = 1f + lettersEaten * speedBoostPerLetter;
 
-        // 몸통 갱신 (몸통 자체 속도 사용)
+        // 머리 속도: 터치 중 vs 비터치 (둘 다 동일 배율 적용)
+        float headSpeed = (isTouchActive ? touchSpeed : speed) * boostMul;
+
+        // 머리 경로 기록 + 경로 따라 몸통 배치 (코너 컷팅 방지)
+        RecordHeadPath();
         UpdateBodyFollow();
 
         rb.linearVelocity = moveDir * headSpeed;
@@ -222,36 +284,164 @@ public class WormController : MonoBehaviour
         transform.position = pos;
     }
 
-    // 몸통이 머리(또는 앞 세그먼트)를 직접 추격 — 몸통 전용 속도 사용 (머리와 독립)
-    // bodySpeed / bodyTouchSpeed × Time.deltaTime 만큼만 이동
+    // 머리의 현재 위치를 경로 기록에 추가하고, 꼬리 끝보다 더 멀리 남은 오래된 점은 잘라냄
+    // — 매 프레임 호출, 머리가 거의 안 움직이면 추가 안 함(노이즈/메모리 절약)
+    void RecordHeadPath()
+    {
+        Vector3 head = transform.position;
+
+        if (headPath.Count == 0)
+        {
+            headPath.Add(head);
+            return;
+        }
+
+        Vector3 last = headPath[^1];
+        // 1e-4 미만 이동은 기록 안 함 (정지/거의 정지 상태)
+        if ((head - last).sqrMagnitude < 1e-8f) return;
+
+        headPath.Add(head);
+
+        // 필요한 경로 길이(꼬리 끝 + 여유 1칸) 넘는 오래된 점 제거 — 메모리/탐색 비용 절약
+        float needed = (bodySegments.Count + 1) * segmentSpacing;
+        float total = 0f;
+        int keepFromIdx = 0;
+        for (int i = headPath.Count - 1; i > 0; i--)
+        {
+            total += Vector3.Distance(headPath[i], headPath[i - 1]);
+            if (total >= needed) { keepFromIdx = i - 1; break; }
+        }
+        if (keepFromIdx > 0)
+            headPath.RemoveRange(0, keepFromIdx);
+    }
+
+    // 몸통이 머리가 실제로 지나간 경로(headPath)를 따라 거리만큼 뒤에 배치됨
     void UpdateBodyFollow()
     {
         if (bodySegments.Count == 0) return;
 
-        // 몸통 자체 속도 (터치 중 / 비터치 분기)
-        float bodyCurrentSpeed = isTouchActive ? bodyTouchSpeed : bodySpeed;
-        float maxStep = bodyCurrentSpeed * Time.deltaTime;
-        Vector3 frontPos = transform.position;
+        Vector3 head = transform.position;
 
-        for (int i = 0; i < bodySegments.Count; i++)
+        // 경로 기록 없으면 모든 몸통을 머리 위치에 모음 (단어 시작 직후 자연스러운 등장)
+        if (headPath.Count == 0)
         {
-            if (bodySegments[i] == null) continue;
+            for (int i = 0; i < bodySegments.Count; i++)
+                if (bodySegments[i] != null)
+                    bodySegments[i].transform.position = head;
+            return;
+        }
 
-            Vector3 curPos = bodySegments[i].transform.position;
-            Vector3 toFront = frontPos - curPos;
-            float dist = toFront.magnitude;
+        // 머리에서 시작해 경로를 뒤로 거슬러 올라가며 (i+1)*segmentSpacing 거리에 각 세그먼트 배치
+        Vector3 walker = head;
+        int pathIdx = headPath.Count - 1;
+        float totalDistance = 0f;
 
-            // 앞 세그먼트로부터 segmentSpacing 거리 떨어진 위치를 목표로
-            Vector3 targetPos = dist > 0.0001f
-                ? frontPos - toFront.normalized * segmentSpacing
-                : curPos;
+        for (int seg = 0; seg < bodySegments.Count; seg++)
+        {
+            float target = (seg + 1) * segmentSpacing;
+            bool placed = false;
 
-            // 머리와 동일한 속도(maxStep)로 목표 향해 이동 — 점프 없이 부드럽게
-            bodySegments[i].transform.position =
-                Vector3.MoveTowards(curPos, targetPos, maxStep);
+            while (pathIdx >= 0)
+            {
+                Vector3 next = headPath[pathIdx];
+                float stepDist = Vector3.Distance(walker, next);
 
-            // 다음 세그먼트의 기준은 이번 세그먼트의 새 위치
-            frontPos = bodySegments[i].transform.position;
+                if (totalDistance + stepDist >= target)
+                {
+                    // 목표 지점은 walker와 next 사이 — 보간으로 정확한 위치 산출
+                    float overshoot = target - totalDistance;
+                    float t = stepDist > 0f ? overshoot / stepDist : 0f;
+                    Vector3 placedPos = Vector3.Lerp(walker, next, t);
+
+                    if (bodySegments[seg] != null)
+                        bodySegments[seg].transform.position = placedPos;
+
+                    // 다음 세그먼트는 이 위치에서 이어서 탐색 (pathIdx는 유지)
+                    walker = placedPos;
+                    totalDistance = target;
+                    placed = true;
+                    break;
+                }
+
+                // 이 경로 구간 전부 소진하고 더 뒤로 — walker를 next로 이동
+                totalDistance += stepDist;
+                walker = next;
+                pathIdx--;
+            }
+
+            if (!placed)
+            {
+                // 경로가 부족함(아직 머리가 충분히 움직이지 않음) — 가장 오래된 점에 둠
+                if (bodySegments[seg] != null)
+                    bodySegments[seg].transform.position = walker;
+            }
+        }
+
+        // ─── 디버그 로깅 ───
+        // 직전 프레임 대비 머리/몸통 각 세그먼트의 이동량 계산
+        // (각 값 = 이번 프레임 이동 거리 = 실제 속도 × Time.deltaTime)
+        // + 부스트 단계 전환 시 직전 단계의 평균 이동량 요약 출력 → 먹기 전/후 비교 용이
+        if (debugLogSpeeds)
+        {
+            float boostMul = 1f + lettersEaten * speedBoostPerLetter;
+            float expectedHeadSpeed = (isTouchActive ? touchSpeed : speed) * boostMul;
+
+            // 부스트 단계가 바뀌었는지 확인 — 바뀌었으면 직전 단계 요약 + 전환 마커 출력
+            if (debugPrevLettersEaten != lettersEaten)
+            {
+                if (debugSampleCount > 0)
+                {
+                    float prevBoostMul = 1f + debugPrevLettersEaten * speedBoostPerLetter;
+                    float avgHead = debugHeadDeltaSum / debugSampleCount;
+                    float avgBody0 = debugBody0DeltaSum / debugSampleCount;
+                    Debug.Log($"[WormSpeed] ===== 부스트 단계 요약: letters={debugPrevLettersEaten} boost={prevBoostMul:F3} | " +
+                              $"샘플={debugSampleCount}프레임 평균 headΔ={avgHead:F4} body0Δ={avgBody0:F4} 차이={(avgBody0 - avgHead):+0.0000;-0.0000} =====");
+                }
+
+                Debug.Log($"[WormSpeed] ===== 전환: letters {debugPrevLettersEaten} → {lettersEaten} (boost {(1f + debugPrevLettersEaten * speedBoostPerLetter):F3} → {boostMul:F3}) =====");
+
+                // 단계 누적 리셋 (전환 직후부터 새 단계 통계 시작)
+                debugPrevLettersEaten = lettersEaten;
+                debugHeadDeltaSum = 0f;
+                debugBody0DeltaSum = 0f;
+                debugSampleCount = 0;
+            }
+
+            if (debugHasPrev)
+            {
+                float headDelta = Vector3.Distance(head, debugPrevHeadPos);
+
+                var sb = new System.Text.StringBuilder();
+                sb.Append($"[WormSpeed] frame={Time.frameCount} dt={Time.deltaTime:F4} ");
+                sb.Append($"headΔ={headDelta:F4} (expSpd={expectedHeadSpeed:F3}, expΔ={expectedHeadSpeed * Time.deltaTime:F4}) ");
+                sb.Append($"letters={lettersEaten} boost={boostMul:F3} touch={isTouchActive} | ");
+
+                float body0Delta = 0f;
+                for (int i = 0; i < bodySegments.Count && i < debugPrevBodyPositions.Count; i++)
+                {
+                    if (bodySegments[i] == null) continue;
+                    float bodyDelta = Vector3.Distance(bodySegments[i].transform.position, debugPrevBodyPositions[i]);
+                    if (i == 0) body0Delta = bodyDelta;
+                    string flag = bodyDelta > headDelta + 1e-4f ? "!" : "";
+                    sb.Append($"body{i}Δ={bodyDelta:F4}{flag} ");
+                }
+                Debug.Log(sb.ToString());
+
+                // 현재 부스트 단계 통계 누적 — 머리가 거의 안 움직인 프레임(정지)은 제외해 평균 왜곡 방지
+                if (headDelta > 1e-4f)
+                {
+                    debugHeadDeltaSum += headDelta;
+                    debugBody0DeltaSum += body0Delta;
+                    debugSampleCount++;
+                }
+            }
+
+            // 이번 프레임 위치를 다음 프레임 비교용으로 저장
+            debugPrevHeadPos = head;
+            debugPrevBodyPositions.Clear();
+            for (int i = 0; i < bodySegments.Count; i++)
+                debugPrevBodyPositions.Add(bodySegments[i] != null ? bodySegments[i].transform.position : Vector3.zero);
+            debugHasPrev = true;
         }
     }
 }

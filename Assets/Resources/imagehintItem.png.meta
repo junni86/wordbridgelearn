@@ -142,10 +142,10 @@ TextureImporter:
       name: imagehintItem_0
       rect:
         serializedVersion: 2
-        x: 130
-        y: 103
-        width: 873
-        height: 1158
+        x: 53
+        y: 135
+        width: 1239
+        height: 879
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

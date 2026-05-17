@@ -80,7 +80,8 @@ public class BombManCharacter : MonoBehaviour
             if (!isMoving) SnapToCurrentCell();
         }
 
-        if (isPaused) return;
+        // 일시정지(자체 isPaused 또는 글로벌 timeScale=0)면 입력/이동 모두 무시
+        if (isPaused || Time.timeScale == 0f) return;
 
         HandleTapInput();
         HandleMovement();

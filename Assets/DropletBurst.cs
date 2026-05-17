@@ -24,9 +24,6 @@ public class DropletBurst : MonoBehaviour
 
     void Start()
     {
-        Debug.Log($"[DropletBurst] Start() 실행됨 - 위치: {transform.position}");
-        Debug.Log($"[DropletBurst] 물방울 {dropletCount}개 생성 시작");
-
         // ScreenWallFitter.HalfW는 leftWall/rightWall 안쪽 경계 사이 거리의 절반
         // (HalfW * 2 = 좌·우 벽 안쪽 사이 가로 간격)
         float wallGap = ScreenWallFitter.HalfW * 2f;
@@ -37,7 +34,6 @@ public class DropletBurst : MonoBehaviour
             // 평균 물방울 월드 가로 = wallGap / N 이 되도록 startSize에 곱할 배율을 계산
             // 결과적으로 localScale = startSize * bgScale, 월드 너비 = spriteWidth * localScale
             bgScale = wallGap / (DropletsAcrossWalls * spriteWidth * startSize);
-            Debug.Log($"[DropletBurst] 벽 사이 간격: {wallGap:F2}, 스프라이트 가로: {spriteWidth:F2}, bgScale: {bgScale:F3}");
         }
         else
         {
@@ -52,8 +48,6 @@ public class DropletBurst : MonoBehaviour
             SpawnDroplet(angle, i);
         }
 
-        Debug.Log($"[DropletBurst] 효과 종료 예정: {duration}초 후");
-
         // 효과가 끝나면 부모 오브젝트 제거
         Destroy(gameObject, duration);
     }
@@ -62,7 +56,6 @@ public class DropletBurst : MonoBehaviour
     void SpawnDroplet(float angle, int index)
     {
         GameObject drop = new GameObject($"Droplet_{index}");
-        Debug.Log($"[DropletBurst] Droplet #{index} 생성 - 각도: {angle:F0}°, 위치: {transform.position}");
         // 위치와 랜덤 Z축 회전을 한 번에 설정
         drop.transform.SetPositionAndRotation(
             transform.position,

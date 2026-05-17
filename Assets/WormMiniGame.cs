@@ -61,7 +61,12 @@ public class WormMiniGame : MiniGameBase
             if (sr != null) bubbleSprite = sr.sprite;
         }
 
-        if (worm != null) worm.FillLetterAt(filledIndex, letter, bubbleSprite);
+        if (worm != null)
+        {
+            worm.FillLetterAt(filledIndex, letter, bubbleSprite);
+            // 정답 글자 1개당 속도 누적 부스트 — 단어 끝나면 SetupWord에서 리셋됨
+            worm.BoostSpeed();
+        }
 
         if (source != null)
         {

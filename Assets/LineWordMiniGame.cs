@@ -95,6 +95,13 @@ public class LineWordMiniGame : MiniGameBase
     {
         if (spawner == null || Camera.main == null) return;
 
+        // 일시정지 중에는 입력 무시 — PausePanel(ContinueButton 등) 위 클릭이 격자 드래그로 새는 것 차단
+        if (Time.timeScale == 0f)
+        {
+            ResetDragState();
+            return;
+        }
+
         // 터치/마우스 입력 통합 처리
         bool pressed = false, held = false, released = false;
         Vector2 screenPos = Vector2.zero;

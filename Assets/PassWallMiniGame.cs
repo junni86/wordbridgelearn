@@ -75,27 +75,21 @@ public class PassWallMiniGame : MiniGameBase
         NotifyLetterTyped(letter, source);
     }
 
-    // 힌트 — 떨어지는 풍선 중 다음 입력 글자(nextLetter)와 일치하는 첫 풍선 1개만 잠시 키움
-    // (화면에서 가장 낮은 위치에 있는 = 캐릭터에 가장 가까운 풍선을 우선 강조)
+    // 힌트 — 떨어지는 풍선 중 다음 입력 글자(nextLetter)와 일치하는 모든 풍선을 동시에 키움
+    // PassWall만 다중 강조 (다른 미니게임은 1개만 강조)
     // PassWallSpawner는 풍선을 자식으로 부착하지 않으므로 씬 전체에서 검색
     public override void ShowHint(string nextLetter, float duration)
     {
         if (string.IsNullOrEmpty(nextLetter)) return;
 
-        PassWallBalloon best = null;
-        float lowestY = float.MaxValue;
+        List<Transform> targets = new();
         foreach (var balloon in FindObjectsByType<PassWallBalloon>(FindObjectsSortMode.None))
         {
             if (balloon == null || balloon.consumed) continue;
             if (balloon.letter != nextLetter) continue;
-            float y = balloon.transform.position.y;
-            if (y < lowestY)
-            {
-                lowestY = y;
-                best = balloon;
-            }
+            targets.Add(balloon.transform);
         }
-        if (best != null)
-            StartCoroutine(AnimateHintHighlight(new List<Transform> { best.transform }, duration));
+        if (targets.Count > 0)
+            StartCoroutine(AnimateHintHighlight(targets, duration));
     }
 }

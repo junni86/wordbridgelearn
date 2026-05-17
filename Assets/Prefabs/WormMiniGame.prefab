@@ -141,6 +141,7 @@ MonoBehaviour:
   fontSize: 76
   randomBubbleCount: 10
   koreanBubbleFont: {fileID: 11400000, guid: 97d9402b89826064893f9b8a76a8e0f2, type: 2}
+  minDistanceFromWorm: 2
 --- !u!1 &5592097440781293550
 GameObject:
   m_ObjectHideFlags: 0
@@ -234,8 +235,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WormController
   speed: 1.5
   touchSpeed: 4
-  bodySpeed: 1.5
-  bodyTouchSpeed: 4
+  speedBoostPerLetter: 0
+  debugLogSpeeds: 0
   headSprite: {fileID: -6117523503395147794, guid: 5408fc0ed9ab4c14ca5a2819f787754d, type: 3}
   emptyBodySprite: {fileID: 7436422402753398512, guid: 1c7527fe7523f824b984d8d4a345774d, type: 3}
   segmentPrefab: {fileID: 3208947731585526566, guid: bff976341eeabb04a879e66c745a393f, type: 3}
@@ -353,8 +354,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WormController
   speed: 1.5
   touchSpeed: 4
-  bodySpeed: 1.5
-  bodyTouchSpeed: 4
+  speedBoostPerLetter: 0
+  debugLogSpeeds: 0
   headSprite: {fileID: -6117523503395147794, guid: 5408fc0ed9ab4c14ca5a2819f787754d, type: 3}
   emptyBodySprite: {fileID: 7436422402753398512, guid: 1c7527fe7523f824b984d8d4a345774d, type: 3}
   segmentPrefab: {fileID: 3208947731585526566, guid: bff976341eeabb04a879e66c745a393f, type: 3}

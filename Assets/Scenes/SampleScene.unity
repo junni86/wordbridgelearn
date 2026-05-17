@@ -2464,7 +2464,7 @@ MonoBehaviour:
   bombManMiniGamePrefab: {fileID: 4496883958822605271, guid: 748aaeb5b009e36479417de65b705d43, type: 3}
   miniGameHost: {fileID: 2074071164}
   completeImage: {fileID: 230309548}
-  debugStartMiniGame: -1
+  debugStartMiniGame: 1
   debugWord: 
   hintSubGap: 10
 --- !u!1 &1404496444

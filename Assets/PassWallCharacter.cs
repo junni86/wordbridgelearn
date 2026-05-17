@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 // PassWall 미니게임 캐릭터
@@ -84,7 +85,12 @@ public class PassWallCharacter : MonoBehaviour
             ApplyScreenRelativeScale();
         }
 
-        if (isPaused) return;
+        // 일시정지(자체 isPaused 또는 글로벌 timeScale=0)면 입력 무시 — PausePanel 위 클릭 차단
+        if (isPaused || Time.timeScale == 0f) return;
+
+        // UI(힌트 버튼 등 UGUI Button) 위 클릭/터치면 캐릭터 이동 트리거 안 함
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+            return;
 
         // 터치/마우스 X 좌표 읽기 — 누르고 있는 동안만 추적
         Vector2? screenPos = null;

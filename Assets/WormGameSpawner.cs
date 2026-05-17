@@ -13,10 +13,11 @@ public class WormGameSpawner : MonoBehaviour
     public GameObject prefab;          // 알파벳 버블 프리팹 (기존 게임과 공용 가능)
     public SpriteRenderer background;  // 생성 범위 기준 배경
 
-    [SerializeField] float bubbleScale = 0.25f;        // 기존 게임의 절반 크기
-    [SerializeField] float fontSize = 6f;              // 글자 크기 (기존과 동일)
+    [SerializeField] float bubbleScale = 0.1f;        // 기존 게임의 절반 크기
+    [SerializeField] float fontSize = 76f;              // 글자 크기 (기존과 동일)
     [SerializeField] int randomBubbleCount = 10;       // 정답 외 추가 랜덤 개수
     [SerializeField] TMP_FontAsset koreanBubbleFont;   // 한글 모드 전용 폰트
+    [SerializeField] float minDistanceFromWorm = 2.0f; // 지렁이 머리(원점) 기준 버블이 들어가지 않을 안전 반경
 
     Sprite[] bubbleSprites;                    // 버블 색상 스프라이트 5종
     readonly List<GameObject> spawnedObjects = new();
@@ -197,12 +198,23 @@ public class WormGameSpawner : MonoBehaviour
         // topWall 아래에만 생성되도록 Y 상한 제한
         float spawnMaxY = ScreenWallFitter.TopBoundaryY - bubbleScale * 0.5f;
 
+        // 지렁이 머리(WormController.SetupWord에서 원점으로 리셋)의 안전 반경 안이면 위치 재추첨
+        // — 시작 직후 지렁이 코앞에 버블이 떨어져 즉시 충돌하는 문제 방지
+        Vector3 wormPos = Vector3.zero;
+        float minDistSqr = minDistanceFromWorm * minDistanceFromWorm;
+        Vector3 pos;
+        int attempts = 0;
+        do
+        {
+            pos = new Vector3(
+                Random.Range(-halfW, halfW),
+                Random.Range(-halfH, spawnMaxY),
+                0f);
+            attempts++;
+        } while ((pos - wormPos).sqrMagnitude < minDistSqr && attempts < 20);
+
         GameObject obj = Instantiate(prefab);
-        obj.transform.position = new Vector3(
-            Random.Range(-halfW, halfW),
-            Random.Range(-halfH, spawnMaxY),
-            0f
-        );
+        obj.transform.position = pos;
         obj.transform.localScale = Vector3.one * bubbleScale;
         // 버블 이미지·글자 묶어 다른 버블과 독립 렌더링
         obj.AddComponent<SortingGroup>();
