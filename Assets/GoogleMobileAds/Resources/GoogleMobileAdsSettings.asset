@@ -18,5 +18,6 @@ MonoBehaviour:
   enableGradleBuildPreProcessor: 1
   disableOptimizeInitialization: 0
   disableOptimizeAdLoading: 0
-  userTrackingUsageDescription: 
+  userTrackingUsageDescription: We use your data to provide personalized ads and
+    improve your app experience.
   userLanguage: en

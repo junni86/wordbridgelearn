@@ -15,6 +15,7 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] Button noAdsButton;        // 광고 안보기 버튼
     [SerializeField] Button serverRankButton;   // 서버 최고 랭킹 버튼
     [SerializeField] Button myScoreButton;      // 나의 최고 점수 버튼
+    [SerializeField] Button restorePurchaseButton; // 구매 복원 버튼 (iOS 전용 표시)
 
     [Header("랭킹 매니저 연결")]
     [SerializeField] RankingManager rankingManager; // RankingManager 오브젝트 연결
@@ -38,6 +39,12 @@ public class MainMenuManager : MonoBehaviour
         if (noAdsButton != null) noAdsButton.onClick.AddListener(OnClickNoAds);
         if (serverRankButton != null) serverRankButton.onClick.AddListener(OnClickServerRank);
         if (myScoreButton != null) myScoreButton.onClick.AddListener(OnClickMyScore);
+        if (restorePurchaseButton != null) restorePurchaseButton.onClick.AddListener(OnClickRestorePurchase);
+
+        // 구매 복원 버튼은 iOS에서만 표시 (Android는 hasReceipt 자동 복원이므로 불필요)
+        // 에디터 디버깅 시에는 아래 라인을 주석 처리하면 모든 플랫폼에서 표시됨
+        if (restorePurchaseButton != null)
+            restorePurchaseButton.gameObject.SetActive(Application.platform == RuntimePlatform.IPhonePlayer);
 
         // PlayerPrefs에 저장된 나의 최고 점수 불러와서 표시
         int myBest = PlayerPrefs.GetInt("BestScore", 0);
@@ -170,6 +177,20 @@ public class MainMenuManager : MonoBehaviour
             IAPManager.Instance.BuyRemoveAds();
         else
             Debug.LogWarning("[MainMenuManager] IAPManager가 없어 구매 불가 (에디터 전용 메시지)");
+    }
+
+    // 구매 복원 버튼 → IAPManager의 복원 처리 호출 (iOS에서 앱 재설치 시 광고 제거 복원용)
+    // 함수 진입 자체를 확인하기 위해 첫 줄에 토스트/로그를 띄움
+    void OnClickRestorePurchase()
+    {
+        Debug.Log("[MainMenuManager] OnClickRestorePurchase 진입");
+        if (ToastManager.Instance != null)
+            ToastManager.Instance.Show("구매 복원 버튼 클릭됨");
+
+        if (IAPManager.Instance != null)
+            IAPManager.Instance.RestorePurchase();
+        else
+            Debug.LogWarning("[MainMenuManager] IAPManager가 없어 복원 불가 (에디터 전용 메시지)");
     }
 
     // 서버 최고 점수 텍스트 갱신 (외부에서 호출 가능)

@@ -2,6 +2,7 @@ using UnityEngine;
 using GoogleMobileAds.Api;
 using System;
 using System.Collections;
+using System.Runtime.InteropServices; // iOS 네이티브 ATT 플러그인 호출용
 
 public class AdsManager : MonoBehaviour
 {
@@ -20,6 +21,12 @@ public class AdsManager : MonoBehaviour
     // Interstitial Android: ca-app-pub-3940256099942544/1033173712
     // Interstitial iOS:     ca-app-pub-3940256099942544/4411468910
 
+#if UNITY_IOS && !UNITY_EDITOR
+    // iOS App Tracking Transparency (ATT) 네이티브 함수 (Plugins/iOS/ATTPlugin.mm 참조)
+    [DllImport("__Internal")] private static extern void _RequestATTAuthorization();
+    [DllImport("__Internal")] private static extern int _GetATTAuthorizationStatus();
+#endif
+
     InterstitialAd interstitialAd;
     int retryCount = 0;
 
@@ -27,31 +34,69 @@ public class AdsManager : MonoBehaviour
     RewardedAd rewardedAd;
     int rewardedRetryCount = 0;
 
+    // 디버깅용 토스트 헬퍼 — ToastManager가 아직 생성 전이거나 씬에 없을 수 있으니 null 안전 호출
+    void DebugToast(string message)
+    {
+        Debug.Log("[AdsManager] " + message);
+        if (ToastManager.Instance != null)
+        {
+            ToastManager.Instance.Show(message);
+        }
+    }
+
     void Awake()
     {
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        // iOS는 ATT 권한 다이얼로그 응답 후 SDK 초기화해야 광고가 정상적으로 로드됨
+        StartCoroutine(InitializeAdsRoutine());
+    }
+
+    // 광고 SDK 초기화 루틴
+    // iOS: ATT 권한 요청 → 사용자 응답 대기 → SDK 초기화 순서로 진행
+    // Android/Editor: ATT 단계 건너뛰고 즉시 SDK 초기화
+    IEnumerator InitializeAdsRoutine()
+    {
+#if UNITY_IOS && !UNITY_EDITOR
+        // 권한 상태 확인 — 0(NotDetermined)이면 다이얼로그를 띄워야 함
+        int status = _GetATTAuthorizationStatus();
+        if (status == 0)
+        {
+            _RequestATTAuthorization();
+            // 사용자가 다이얼로그에 응답할 때까지 폴링 (최대 30초 안전장치)
+            float timeout = 30f;
+            while (_GetATTAuthorizationStatus() == 0 && timeout > 0f)
+            {
+                yield return new WaitForSeconds(0.3f);
+                timeout -= 0.3f;
+            }
+            status = _GetATTAuthorizationStatus();
+        }
+        DebugToast($"ATT status: {status} (0:미응답 1:제한 2:거부 3:허용)");
+#endif
         MobileAds.RaiseAdEventsOnUnityMainThread = true;
-        MobileAds.Initialize(_ => Debug.Log("[AdsManager] SDK init complete"));
+        MobileAds.Initialize(_ => DebugToast("SDK init complete"));
         LoadInterstitial();
         LoadRewarded();
+        yield break;
     }
 
     void LoadInterstitial(int retry = 0)
     {
-        if (retry >= 3) { Debug.LogWarning("[AdsManager] Load failed 3 times — giving up"); return; }
+        if (retry >= 3) { DebugToast("전면광고 로드 3회 실패 — 포기"); return; }
         retryCount = retry;
         interstitialAd?.Destroy();
         InterstitialAd.Load(INTERSTITIAL_ID, new AdRequest(), (ad, error) =>
         {
             if (error != null)
             {
-                Debug.LogWarning($"[AdsManager] Load failed ({retry + 1}/3): {error}");
+                DebugToast($"전면광고 로드 실패 ({retry + 1}/3): {error}");
                 Invoke(nameof(LoadInterstitialRetry), 5f);
                 return;
             }
             interstitialAd = ad;
+            DebugToast("전면광고 로드 성공");
         });
     }
 
@@ -108,18 +153,19 @@ public class AdsManager : MonoBehaviour
 
     void LoadRewarded(int retry = 0)
     {
-        if (retry >= 3) { Debug.LogWarning("[AdsManager] Rewarded load failed 3 times — giving up"); return; }
+        if (retry >= 3) { DebugToast("보상광고 로드 3회 실패 — 포기"); return; }
         rewardedRetryCount = retry;
         rewardedAd?.Destroy();
         RewardedAd.Load(REWARDED_ID, new AdRequest(), (ad, error) =>
         {
             if (error != null)
             {
-                Debug.LogWarning($"[AdsManager] Rewarded load failed ({retry + 1}/3): {error}");
+                DebugToast($"보상광고 로드 실패 ({retry + 1}/3): {error}");
                 Invoke(nameof(LoadRewardedRetry), 5f);
                 return;
             }
             rewardedAd = ad;
+            DebugToast("보상광고 로드 성공");
         });
     }
 
@@ -133,7 +179,7 @@ public class AdsManager : MonoBehaviour
     {
         if (rewardedAd == null || !rewardedAd.CanShowAd())
         {
-            Debug.LogWarning("[AdsManager] Rewarded 광고 준비 안 됨 — 보상 없이 닫힘 처리");
+            DebugToast("보상광고 준비 안 됨 — 닫힘 처리");
             onClosed?.Invoke();
             LoadRewarded();
             return;
@@ -147,7 +193,7 @@ public class AdsManager : MonoBehaviour
         };
         rewardedAd.OnAdFullScreenContentFailed += err =>
         {
-            Debug.LogWarning($"[AdsManager] Rewarded show failed: {err}");
+            DebugToast($"보상광고 표시 실패: {err}");
             onClosed?.Invoke();
             LoadRewarded();
         };
