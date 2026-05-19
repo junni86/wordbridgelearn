@@ -91,10 +91,14 @@ public class IAPManager : MonoBehaviour, IStoreListener
         if (apple != null)
         {
             DebugToast("iOS StoreKit 복원 요청 중...");
-            apple.RestoreTransactions(result =>
+            // Unity IAP 5.x: RestoreTransactions 콜백 시그니처가 Action<bool, string>으로 변경됨
+            //   success: 복원 요청 성공 여부 (실제 영수증 존재 여부와는 별개)
+            //   error: 실패 시 에러 메시지 (성공 시 null/빈 문자열)
+            // 복원된 영수증은 ProcessPurchase 콜백에서 별도로 처리됨
+            apple.RestoreTransactions((success, error) =>
             {
-                DebugToast("iOS 복원 결과: " + result);
-                // 복원된 영수증은 ProcessPurchase 콜백에서 처리됨
+                string detail = string.IsNullOrEmpty(error) ? "" : " / err=" + error;
+                DebugToast("iOS 복원 결과: success=" + success + detail);
             });
         }
         else
