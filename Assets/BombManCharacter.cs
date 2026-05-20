@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 // - 9×11 그리드 위에서 셀 단위로 가로/세로 이동 (대각선 X)
 // - 터치/마우스를 누르고 있는 동안 그 위치(셀)를 향해 자동 이동
 //   · 더 큰 축(가로/세로) 먼저 이동, 벽돌·글자·폭탄에 막히면 정지
-// - 캐릭터 영역을 더블 탭(0.3초 이내 2번)하면 자기 셀에 폭탄 설치 요청
+// - 화면을 더블 탭(doubleTapInterval 이내 2번)하면 캐릭터 현재 셀에 폭탄 설치 요청
 // - 자기 폭탄 폭발에 휘말리면 OnCaughtByExplosion() — 0.5초 정지 + 오답 패널티(호스트 위임)
 [RequireComponent(typeof(Collider2D))]
 public class BombManCharacter : MonoBehaviour
@@ -35,8 +35,11 @@ public class BombManCharacter : MonoBehaviour
     bool isMoving;
     bool isPaused;
 
-    // 더블 탭 감지 — 캐릭터 콜라이더 영역에서 발생한 탭만 카운트
-    float lastTapOnSelfTime = -10f;
+    // 더블 탭 감지 — 화면 어디든 두 번 탭하면 폭탄 설치 (0.4초 이내)
+    float lastTapTime = -10f;
+
+    // 폭탄 설치가 발생한 프레임에는 같은 입력이 이동 명령으로도 해석되지 않도록 1프레임 차단
+    bool suppressMovementThisFrame;
 
     Collider2D selfCol;
     SpriteRenderer cachedSr;
@@ -87,42 +90,32 @@ public class BombManCharacter : MonoBehaviour
         HandleMovement();
     }
 
-    // 터치/마우스 입력 — 탭한 셀이 캐릭터 현재 셀이면 더블 탭 후보로 카운트
-    // (이전엔 콜라이더 OverlapPoint로 판정했으나, 캐릭터 transform이 셀 크기에 맞춰 축소되면
-    //  콜라이더의 월드 반경도 함께 작아져 탭이 잘 안 잡히는 문제가 있어 격자 기반으로 변경)
+    // 터치/마우스 입력 — 화면 어디든 두 번 탭하면 캐릭터 현재 셀에 폭탄 설치
+    // (위치 무관: 더 이상 캐릭터 셀 위에서만 탭을 받지 않음)
     void HandleTapInput()
     {
         bool tapStarted = false;
-        Vector2 screenPos = Vector2.zero;
 
         if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
-        {
             tapStarted = true;
-            screenPos = Touchscreen.current.primaryTouch.position.ReadValue();
-        }
         else if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
-        {
             tapStarted = true;
-            screenPos = Mouse.current.position.ReadValue();
-        }
 
-        if (!tapStarted || Camera.main == null || spawner == null) return;
-
-        // 탭한 위치가 캐릭터 현재 셀인지로 판정
-        Vector3 world = Camera.main.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, 0f));
-        if (!spawner.WorldToCell(world, out int tapCol, out int tapRow)) return;
-        if (tapCol != currentCol || tapRow != currentRow) return;
+        if (!tapStarted) return;
 
         float now = Time.time;
-        if (now - lastTapOnSelfTime <= doubleTapInterval)
+        if (now - lastTapTime <= doubleTapInterval)
         {
-            // 두 번째 탭 — 폭탄 설치 요청
-            lastTapOnSelfTime = -10f; // 리셋
+            // 두 번째 탭 — 폭탄 설치 요청 (위치 무관, 항상 캐릭터 현재 셀에 설치)
+            lastTapTime = -10f; // 리셋
             if (owner != null) owner.RequestPlaceBomb(currentCol, currentRow);
+
+            // 같은 프레임에 HandleMovement가 이 탭을 이동 명령으로도 해석하지 않도록 차단
+            suppressMovementThisFrame = true;
         }
         else
         {
-            lastTapOnSelfTime = now;
+            lastTapTime = now;
         }
     }
 
@@ -147,6 +140,13 @@ public class BombManCharacter : MonoBehaviour
                 currentRow = nextRow;
                 isMoving = false;
             }
+            return;
+        }
+
+        // 폭탄 설치가 발생한 프레임은 이동 명령 무시 (같은 탭이 이동으로도 해석되는 것 방지)
+        if (suppressMovementThisFrame)
+        {
+            suppressMovementThisFrame = false;
             return;
         }
 

@@ -141,7 +141,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3502dcd5c118f64bbd37466c78acd7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BombManCharacter
-  moveSpeed: 6
+  moveSpeed: 9
   caughtPauseDuration: 0.5
   widthRatioOfCell: 0.75
   doubleTapInterval: 0.3
