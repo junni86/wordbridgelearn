@@ -9,7 +9,14 @@ public class IAPManager : MonoBehaviour, IStoreListener
     private static IStoreController storeController;
     private static IExtensionProvider storeExtensionProvider;
 
+    // 광고 제거 인앱 상품 ID — 플랫폼별로 스토어에 등록된 ID 가 다르므로 분기 처리
+    // Android: Google Play Console 등록 ID = "remove_ads" (소문자/언더스코어)
+    // iOS:     App Store Connect 등록 ID  = "RemoveAds" (PascalCase)
+#if UNITY_IOS
+    private const string REMOVE_ADS_ID = "RemoveAds";
+#else
     private const string REMOVE_ADS_ID = "remove_ads";
+#endif
 
     public bool IsNoAds
     {
