@@ -1,14 +1,14 @@
 # ninja log v5
-1	359	8010775777923194	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	3dda5c3969148b6f
+118	250	8010795101671578	C:/Users/junni/Language_Game/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/Debug/v1f251u6/obj/arm64-v8a/libswappywrapper.so	a9b7449e41e19ef3
+2	118	8010795100399768	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	3dda5c3969148b6f
 12	1357	7995793402304043	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	f94068128b9c2227
-359	554	8010775779812627	C:/Users/junni/Language_Game/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/Debug/v1f251u6/obj/arm64-v8a/libswappywrapper.so	a9b7449e41e19ef3
 34	1173	7995793400639509	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	4d37f716edfbfbf3
 60	1162	7995793400511431	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	3ceec13a4f5512cb
 26	1158	7995793400462618	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	ba725851dd533e76
-20	1217	7995793401076580	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	541129a728918630
 43	1185	7995793400750350	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	2bfeae1e530ee38d
+20	1217	7995793401076580	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	541129a728918630
 51	1296	7995793401853934	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	168847b3ac5b7987
 68	1266	7995793401515851	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	d43e530653c3a038
 1357	1500	7995793403904539	C:/Users/junni/Language_Game/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/Debug/v1f251u6/obj/arm64-v8a/libgame.so	a4e7cf6b9f4ff01a
-2	118	8010795100399768	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	3dda5c3969148b6f
-118	250	8010795101671578	C:/Users/junni/Language_Game/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/Debug/v1f251u6/obj/arm64-v8a/libswappywrapper.so	a9b7449e41e19ef3
+2	366	8011507629015162	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	3dda5c3969148b6f
+366	553	8011507630802623	C:/Users/junni/Language_Game/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/Debug/v1f251u6/obj/arm64-v8a/libswappywrapper.so	a9b7449e41e19ef3

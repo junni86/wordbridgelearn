@@ -44,7 +44,11 @@ public class MainMenuManager : MonoBehaviour
         // 구매 복원 버튼은 iOS에서만 표시 (Android는 hasReceipt 자동 복원이므로 불필요)
         // 에디터 디버깅 시에는 아래 라인을 주석 처리하면 모든 플랫폼에서 표시됨
         if (restorePurchaseButton != null)
-            restorePurchaseButton.gameObject.SetActive(Application.platform == RuntimePlatform.IPhonePlayer);
+            restorePurchaseButton.gameObject.SetActive(false);
+        // restorePurchaseButton.gameObject.SetActive(Application.platform == RuntimePlatform.IPhonePlayer);
+
+        if (noAdsButton != null)
+            noAdsButton.gameObject.SetActive(Application.platform != RuntimePlatform.IPhonePlayer);
 
         // PlayerPrefs에 저장된 나의 최고 점수 불러와서 표시
         int myBest = PlayerPrefs.GetInt("BestScore", 0);
