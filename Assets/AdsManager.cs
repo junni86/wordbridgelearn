@@ -37,11 +37,11 @@ public class AdsManager : MonoBehaviour
     // 디버깅용 토스트 헬퍼 — ToastManager가 아직 생성 전이거나 씬에 없을 수 있으니 null 안전 호출
     void DebugToast(string message)
     {
-        // Debug.Log("[AdsManager] " + message);
-        // if (ToastManager.Instance != null)
-        // {
-        //     ToastManager.Instance.Show(message);
-        // }
+        Debug.Log("[AdsManager] " + message);
+        if (ToastManager.Instance != null)
+        {
+            ToastManager.Instance.Show(message);
+        }
     }
 
     void Awake()
