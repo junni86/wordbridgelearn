@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -23,7 +24,10 @@ public class ToastManager : MonoBehaviour
     [Header("위치 설정")]
     [SerializeField] float bottomOffset = 300f; // 화면 하단에서 올라오는 거리(픽셀)
 
-    Coroutine currentToast;
+    // 도착한 메시지를 순서대로 보관하는 큐 — 빠르게 연속 호출되어도 손실 없이 하나씩 표시
+    readonly Queue<string> messageQueue = new Queue<string>();
+    // 현재 큐 소진 코루틴이 도는 중인지 — 중복 시작 방지
+    bool isProcessingQueue = false;
 
     void Awake()
     {
@@ -39,10 +43,27 @@ public class ToastManager : MonoBehaviour
     {
         if (canvasGroup == null || toastText == null) return;
 
-        if (currentToast != null)
-            StopCoroutine(currentToast);
+        // 큐에 적재만 하고 즉시 반환 — 표시 작업은 ProcessQueue 가 순차 처리
+        messageQueue.Enqueue(message);
 
-        currentToast = StartCoroutine(ShowRoutine(message));
+        // 이미 처리 중이면 추가만 하고 종료, 아니면 새로 시작
+        if (!isProcessingQueue)
+        {
+            StartCoroutine(ProcessQueue());
+        }
+    }
+
+    // 큐가 빌 때까지 메시지를 하나씩 페이드인 → 유지 → 페이드아웃 완전 사이클로 표시
+    // 이전엔 새 토스트가 오면 이전 코루틴을 즉시 중단해서 페이드 인 중이던 토스트가 사라지는 문제가 있었음
+    IEnumerator ProcessQueue()
+    {
+        isProcessingQueue = true;
+        while (messageQueue.Count > 0)
+        {
+            string next = messageQueue.Dequeue();
+            yield return StartCoroutine(ShowRoutine(next));
+        }
+        isProcessingQueue = false;
     }
 
     IEnumerator ShowRoutine(string message)
@@ -78,7 +99,6 @@ public class ToastManager : MonoBehaviour
         }
         canvasGroup.alpha          = 0f;
         canvasGroup.blocksRaycasts = false; // 토스트 종료 후 클릭 차단 해제
-        currentToast = null;
     }
 
     void ResizeAndPosition()
