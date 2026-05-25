@@ -25,6 +25,9 @@ public class AdsManager : MonoBehaviour
     // iOS App Tracking Transparency (ATT) 네이티브 함수 (Plugins/iOS/ATTPlugin.mm 참조)
     [DllImport("__Internal")] private static extern void _RequestATTAuthorization();
     [DllImport("__Internal")] private static extern int _GetATTAuthorizationStatus();
+    // 앱이 UIApplicationStateActive 인지 네이티브에서 직접 확인 (1 = Active, 0 = Inactive)
+    // Application.isFocused 보다 정확함 — ATT 다이얼로그는 반드시 Active 상태에서만 표시됨
+    [DllImport("__Internal")] private static extern int _GetApplicationActiveState();
 #endif
 
     InterstitialAd interstitialAd;
@@ -61,21 +64,43 @@ public class AdsManager : MonoBehaviour
 #if UNITY_IOS && !UNITY_EDITOR
         // iOS 15+ 는 앱이 UIApplicationState.Active 일 때만 ATT 다이얼로그를 띄움
         // Awake 직후엔 아직 Inactive 라 _RequestATTAuthorization() 호출이 무시되는 경우가 있어
-        // 첫 프레임 + 렌더 사이클 + 포커스 확보까지 대기한 뒤 호출
+        // 첫 프레임 + 렌더 사이클 + applicationState=Active 확보까지 대기한 뒤 호출
+        // Application.isFocused 는 Unity 내부 상태라 실제 iOS applicationState 와 미세한 시점 차이가 있어
+        // 네이티브의 _GetApplicationActiveState() 로 직접 확인하는 게 더 안전함
+
+        // 진단 토스트 1: 루틴 시작 시점에 iOS 버전과 초기 상태 확인
+        DebugToast($"[ATT-1] 루틴 시작 | iOS={SystemInfo.operatingSystem}");
+
         yield return null;                      // 1프레임 양보 (Start 단계까지 진행)
         yield return new WaitForEndOfFrame();   // 렌더 사이클 완료 대기
-        float focusWait = 3f;                   // 포커스 안전장치 (최대 3초)
-        while (!Application.isFocused && focusWait > 0f)
+
+        // 진단 토스트 2: 첫 프레임 대기 후 Active 상태 폴링 시작 직전
+        DebugToast($"[ATT-2] 폴링전 active={_GetApplicationActiveState()} focused={Application.isFocused}");
+
+        float activeWait = 5f;                  // Active 상태 안전장치 (최대 5초)
+        while (_GetApplicationActiveState() != 1 && activeWait > 0f)
         {
             yield return new WaitForSeconds(0.1f);
-            focusWait -= 0.1f;
+            activeWait -= 0.1f;
         }
+
+        // 진단 토스트 3: 폴링 종료 시점의 Active 상태 + 대기 소요 시간
+        float waitedSec = 5f - activeWait;
+        DebugToast($"[ATT-3] 폴링후 active={_GetApplicationActiveState()} 대기={waitedSec:F1}s");
 
         // 권한 상태 확인 — 0(NotDetermined)이면 다이얼로그를 띄워야 함
         int status = _GetATTAuthorizationStatus();
+
+        // 진단 토스트 4: 호출 전 status 값 확인 (0 이어야 다이얼로그 표시 시도)
+        DebugToast($"[ATT-4] 호출전 status={status}");
+
         if (status == 0)
         {
             _RequestATTAuthorization();
+
+            // 진단 토스트 5: _RequestATTAuthorization 반환 직후 (dispatch_async 라 즉시 반환됨)
+            DebugToast("[ATT-5] 요청 반환됨, 폴링 시작");
+
             // 사용자가 다이얼로그에 응답할 때까지 폴링 (최대 30초 안전장치)
             float timeout = 30f;
             while (_GetATTAuthorizationStatus() == 0 && timeout > 0f)
@@ -83,7 +108,17 @@ public class AdsManager : MonoBehaviour
                 yield return new WaitForSeconds(0.3f);
                 timeout -= 0.3f;
             }
+
+            // 진단 토스트 6: 폴링 중 status 변화 여부 (사용자 응답 받았는지 / 타임아웃인지)
+            float pollSec = 30f - timeout;
+            DebugToast($"[ATT-6] 폴링끝 status={_GetATTAuthorizationStatus()} 경과={pollSec:F1}s");
+
             status = _GetATTAuthorizationStatus();
+        }
+        else
+        {
+            // 진단 토스트 7: 이미 응답한 적이 있어서 다이얼로그 표시 시도 안 함
+            DebugToast($"[ATT-7] 이미 응답됨 status={status} — 다이얼로그 스킵");
         }
         DebugToast($"ATT status: {status} (0:미응답 1:제한 2:거부 3:허용)");
 #endif

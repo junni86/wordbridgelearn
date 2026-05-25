@@ -37,4 +37,26 @@ extern "C" {
         // iOS 13 이하는 ATT 개념이 없으므로 항상 허용 상태로 취급
         return 3;
     }
+
+    // 앱이 UIApplicationStateActive 상태인지 직접 확인
+    // ATT 다이얼로그는 반드시 Active 상태일 때만 표시되며, Unity 의 Application.isFocused 와는
+    // 시점이 미세하게 다를 수 있어 네이티브에서 직접 확인하는 게 더 정확하다.
+    // 반환값: 1 = Active, 0 = Inactive 또는 Background
+    //
+    // [UIApplication sharedApplication] 호출은 메인 스레드에서 해야 하므로
+    // dispatch_sync 로 메인 큐에서 동기 실행 (이미 메인 스레드면 데드락 회피하여 즉시 실행)
+    int _GetApplicationActiveState() {
+        __block int result = 0;
+        void (^block)(void) = ^{
+            if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+                result = 1;
+            }
+        };
+        if ([NSThread isMainThread]) {
+            block();
+        } else {
+            dispatch_sync(dispatch_get_main_queue(), block);
+        }
+        return result;
+    }
 }
