@@ -41,10 +41,10 @@ public class AdsManager : MonoBehaviour
     void DebugToast(string message)
     {
         Debug.Log("[AdsManager] " + message);
-        if (ToastManager.Instance != null)
-        {
-            ToastManager.Instance.Show(message);
-        }
+        // if (ToastManager.Instance != null)
+        // {
+        //     ToastManager.Instance.Show(message);
+        // }
     }
 
     void Awake()
