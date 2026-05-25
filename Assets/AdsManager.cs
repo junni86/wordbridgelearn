@@ -59,6 +59,18 @@ public class AdsManager : MonoBehaviour
     IEnumerator InitializeAdsRoutine()
     {
 #if UNITY_IOS && !UNITY_EDITOR
+        // iOS 15+ 는 앱이 UIApplicationState.Active 일 때만 ATT 다이얼로그를 띄움
+        // Awake 직후엔 아직 Inactive 라 _RequestATTAuthorization() 호출이 무시되는 경우가 있어
+        // 첫 프레임 + 렌더 사이클 + 포커스 확보까지 대기한 뒤 호출
+        yield return null;                      // 1프레임 양보 (Start 단계까지 진행)
+        yield return new WaitForEndOfFrame();   // 렌더 사이클 완료 대기
+        float focusWait = 3f;                   // 포커스 안전장치 (최대 3초)
+        while (!Application.isFocused && focusWait > 0f)
+        {
+            yield return new WaitForSeconds(0.1f);
+            focusWait -= 0.1f;
+        }
+
         // 권한 상태 확인 — 0(NotDetermined)이면 다이얼로그를 띄워야 함
         int status = _GetATTAuthorizationStatus();
         if (status == 0)
