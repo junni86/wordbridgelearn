@@ -11,11 +11,17 @@ extern "C" {
     // ATT 권한 요청 다이얼로그 표시
     // iOS 14 미만에서는 다이얼로그 없이 무시됨 (구버전에는 ATT 개념이 없음)
     // 결과 콜백은 받지 않음 - GMA SDK가 status에 맞춰 자동으로 처리하므로 충분
+    //
+    // 메인 스레드 보장: ATT 다이얼로그는 UI 작업이므로 반드시 메인 스레드에서 호출해야 함.
+    // Unity C# 코루틴은 보통 메인 스레드에서 동작하지만, [DllImport] 호출 경로나 향후 변경에
+    // 영향받지 않도록 dispatch_async 로 메인 큐에 명시적으로 디스패치하여 안전성을 확보한다.
     void _RequestATTAuthorization() {
         if (@available(iOS 14, *)) {
-            [ATTrackingManager requestTrackingAuthorizationWithCompletionHandler:^(ATTrackingManagerAuthorizationStatus status) {
-                // 사용자 응답 결과는 _GetATTAuthorizationStatus()로 폴링하여 확인
-            }];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [ATTrackingManager requestTrackingAuthorizationWithCompletionHandler:^(ATTrackingManagerAuthorizationStatus status) {
+                    // 사용자 응답 결과는 _GetATTAuthorizationStatus()로 폴링하여 확인
+                }];
+            });
         }
     }
 
