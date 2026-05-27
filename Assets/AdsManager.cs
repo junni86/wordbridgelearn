@@ -21,6 +21,9 @@ public class AdsManager : MonoBehaviour
     // Interstitial Android: ca-app-pub-3940256099942544/1033173712
     // Interstitial iOS:     ca-app-pub-3940256099942544/4411468910
 
+    // 보상용 테스트 ID
+    // Interstitial iOS:     ca-app-pub-3940256099942544/1712485313
+
 #if UNITY_IOS && !UNITY_EDITOR
     // iOS App Tracking Transparency (ATT) 네이티브 함수 (Plugins/iOS/ATTPlugin.mm 참조)
     [DllImport("__Internal")] private static extern void _RequestATTAuthorization();
