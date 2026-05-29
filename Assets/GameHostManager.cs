@@ -444,8 +444,20 @@ public class GameHostManager : MonoBehaviour
 
         score += 10;
         UpdateScoreDisplay();
-        if (score > PlayerPrefs.GetInt("BestScore", 0))
+        // 최고 점수 갱신 시, 그 시점의 스테이지도 함께 저장 (BestStage는 "최고점수 달성 당시의 스테이지")
+        int prevBestScoreA = PlayerPrefs.GetInt("BestScore", 0);
+        int prevBestStageA = PlayerPrefs.GetInt("BestStage", 1);
+        if (score > prevBestScoreA)
+        {
             PlayerPrefs.SetInt("BestScore", score);
+            PlayerPrefs.SetInt("BestStage", stage);
+            PlayerPrefs.Save(); // 디스크에 즉시 반영 (앱 강제 종료 대비)
+            Debug.Log($"[BestUpdate/OnWordCompleted] score:{prevBestScoreA}->{score}, stage:{prevBestStageA}->{stage} (현재 stage={stage})");
+        }
+        else
+        {
+            Debug.Log($"[BestUpdate/OnWordCompleted] 갱신없음 — score:{score}<=Best:{prevBestScoreA}, 현재 stage={stage}, BestStage={prevBestStageA}");
+        }
 
         roundsInStage++;
 
@@ -462,8 +474,8 @@ public class GameHostManager : MonoBehaviour
             stage++;
             roundsInStage = 0;
 
-            if (stage > PlayerPrefs.GetInt("BestStage", 1))
-                PlayerPrefs.SetInt("BestStage", stage);
+            // BestStage는 BestScore 갱신 시점에 함께 저장되므로 여기서는 단독 갱신하지 않음
+            // (stage만 단독으로 갱신하면 "최고점수 당시 스테이지"와 어긋나는 버그 발생)
 
             MiniGameSelector.CurrentStage = stage;
 
@@ -548,10 +560,20 @@ public class GameHostManager : MonoBehaviour
     // 점수 저장 (씬 이동 전 호출)
     public void SaveScore()
     {
-        if (score > PlayerPrefs.GetInt("BestScore", 0))
+        // 최고 점수 갱신 시, 그 시점의 스테이지도 함께 저장 (BestStage는 "최고점수 달성 당시의 스테이지")
+        int prevBestScoreB = PlayerPrefs.GetInt("BestScore", 0);
+        int prevBestStageB = PlayerPrefs.GetInt("BestStage", 1);
+        if (score > prevBestScoreB)
+        {
             PlayerPrefs.SetInt("BestScore", score);
-        if (stage > PlayerPrefs.GetInt("BestStage", 1))
             PlayerPrefs.SetInt("BestStage", stage);
+            PlayerPrefs.Save(); // 디스크에 즉시 반영 (앱 강제 종료 대비)
+            Debug.Log($"[BestUpdate/SaveScore] score:{prevBestScoreB}->{score}, stage:{prevBestStageB}->{stage} (현재 stage={stage})");
+        }
+        else
+        {
+            Debug.Log($"[BestUpdate/SaveScore] 갱신없음 — score:{score}<=Best:{prevBestScoreB}, 현재 stage={stage}, BestStage={prevBestStageB}");
+        }
     }
 
     // ─── UI 갱신 ─────────────────────────────────────────────────────────────

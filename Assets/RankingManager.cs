@@ -324,6 +324,8 @@ public class RankingManager : MonoBehaviour
         // PlayerPrefs에서 최고 점수/스테이지 읽기
         int bestScore = PlayerPrefs.GetInt("BestScore", 0);
         int bestStage = PlayerPrefs.GetInt("BestStage", 1);
+        // 서버 업로드 직전 PlayerPrefs 실제 읽힌 값 — stage 갱신 누락 원인 추적용
+        Debug.Log($"[Ranking/Submit] 업로드 직전 PlayerPrefs 읽기 → BestScore={bestScore}, BestStage={bestStage}");
 
         // 국가 코드 읽기 (예: KR, US)
         string country = RegionInfo.CurrentRegion.TwoLetterISORegionName;
